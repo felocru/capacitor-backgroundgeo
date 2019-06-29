@@ -96,10 +96,15 @@ public class BackgroundService extends Service {
         super.onDestroy();
         if (mLocationManager != null) {
             try {
-                if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED
-                    || checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+                if (Build.VERSION.SDK_INT >= 23){
+                    if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED
+                            || checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+                        mLocationManager.removeUpdates(mLocationListener);
+                    }
+                }else{
                     mLocationManager.removeUpdates(mLocationListener);
                 }
+
             } catch (Exception ex) {
                 Log.i(TAG, "fail to remove location listners, ignore", ex);
             }
@@ -116,10 +121,15 @@ public class BackgroundService extends Service {
         initializeLocationManager();
         mLocationListener = new LocationListener(LocationManager.GPS_PROVIDER);
         try {
-            if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED
-                    || checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+            if (Build.VERSION.SDK_INT >= 23){
+                if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION ) == PackageManager.PERMISSION_GRANTED
+                        || checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+                    mLocationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE, mLocationListener );
+                }
+            }else{
                 mLocationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE, mLocationListener );
             }
+
 
 
         } catch (java.lang.SecurityException ex) {
