@@ -13,7 +13,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 
 @NativePlugin(permissions = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION})
-public class BackgroundGeoPlugin extends Plugin {
+public class BackgroundGeo extends Plugin {
 
     public BackgroundService gpsService;
     public boolean mTracking = false;
