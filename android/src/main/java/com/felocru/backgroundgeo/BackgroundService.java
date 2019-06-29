@@ -17,7 +17,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.felocru.backgroundgeo.capacitorbackgroundgeo.R;
 
 public class BackgroundService extends Service {
     private final LocationServiceBinder binder = new LocationServiceBinder();
@@ -89,7 +88,7 @@ public class BackgroundService extends Service {
             startForeground(12345678, getNotification2());
         }
     }
-
+    @SuppressWarnings("MissingPermission")
     @Override
     public void onDestroy()
     {
@@ -116,7 +115,7 @@ public class BackgroundService extends Service {
             mLocationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         }
     }
-
+    @SuppressWarnings("MissingPermission")
     public void startTracking() {
         initializeLocationManager();
         mLocationListener = new LocationListener(LocationManager.GPS_PROVIDER);
