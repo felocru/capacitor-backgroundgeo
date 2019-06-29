@@ -19,6 +19,9 @@ public class BackgroundGeo extends Plugin {
     public boolean mTracking = false;
     private Intent intent = null;
 
+    /**
+     * TODO: add success and failer
+     */
     @PluginMethod()
     public void startBackground(final PluginCall call){
         this.intent = new Intent(getContext().getApplicationContext(),BackgroundService.class);

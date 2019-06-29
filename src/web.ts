@@ -13,6 +13,12 @@ export class BackgroundGeoWeb extends WebPlugin implements BackgroundGeoPlugin {
     console.log('ECHO', options);
     return options;
   }
+  async startBackground(){
+    
+  }
+  async stopBackground(){
+    
+  }
 }
 
 const BackgroundGeo = new BackgroundGeoWeb();
