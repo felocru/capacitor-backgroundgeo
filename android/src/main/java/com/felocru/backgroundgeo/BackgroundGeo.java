@@ -1,8 +1,13 @@
 package com.felocru.backgroundgeo;
 
 import android.Manifest;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.location.Location;
+import android.os.IBinder;
+
 import com.getcapacitor.JSObject;
 import com.getcapacitor.NativePlugin;
 import com.getcapacitor.Plugin;
@@ -11,11 +16,14 @@ import com.getcapacitor.PluginMethod;
 
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import android.util.Log;
 
 @NativePlugin(permissions = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION})
 public class BackgroundGeo extends Plugin {
 
     public BackgroundService gpsService;
+    private final String TAG = "BackgroundGeo";
+
     public boolean mTracking = false;
     private Intent intent = null;
 
@@ -26,6 +34,7 @@ public class BackgroundGeo extends Plugin {
     public void startBackground(final PluginCall call){
         this.intent = new Intent(getContext().getApplicationContext(),BackgroundService.class);
         getContext().startService(this.intent);
+        getContext().getApplicationContext().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
         gpsService.startTracking();
         mTracking = true;
         Disposable disposable = RxBus.subscribe(new Consumer<Object>() {
@@ -57,4 +66,23 @@ public class BackgroundGeo extends Plugin {
         coords.put("heading", location.getBearing());
         return ret;
     }
+
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            String nameClass = name.getClassName();
+            if(nameClass.endsWith("BackgroundService")){
+                gpsService = ((BackgroundService.LocationServiceBinder) service).getService();
+                Log.i(TAG, "GPS Ready");
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            if (name.getClassName().equals("BackgroundService")){
+                gpsService = null;
+                Log.i(TAG, "GPS disconnec");
+            }
+        }
+    };
 }
