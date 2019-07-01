@@ -35,8 +35,6 @@ public class BackgroundGeo extends Plugin {
         this.intent = new Intent(getContext().getApplicationContext(),BackgroundService.class);
         getContext().startService(this.intent);
         getContext().getApplicationContext().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-        gpsService.startTracking();
-        mTracking = true;
         Disposable disposable = RxBus.subscribe(new Consumer<Object>() {
             @Override
             public void accept(Object o) throws Exception{
@@ -74,6 +72,8 @@ public class BackgroundGeo extends Plugin {
             String nameClass = name.getClassName();
             if(nameClass.endsWith("BackgroundService")){
                 gpsService = ((BackgroundService.LocationServiceBinder) service).getService();
+                gpsService.startTracking();
+                mTracking = true;
                 Log.i(TAG, "GPS Ready");
             }
         }
