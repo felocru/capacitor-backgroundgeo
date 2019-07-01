@@ -7,7 +7,7 @@ declare module "@capacitor/core" {
 export interface BackgroundGeoPlugin {
   echo(options: { value: string }): Promise<{value: string}>;
   startBackground(): void;
-  stopBackground(): void;
+  stopBackground(force?:boolean): void;
 }
 export interface FusedLocationPosition {
     coords: {
