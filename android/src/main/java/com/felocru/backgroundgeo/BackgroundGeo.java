@@ -42,6 +42,7 @@ public class BackgroundGeo extends Plugin {
             public void accept(Object o) throws Exception{
                 if (o instanceof JSObject){
                     Location location = (Location)((JSObject) o).get("location");
+                    Log.i(TAG, "BackgroundEvent noti: "+location.toString());
                     notifyListeners("backgroundEvent", getJSObjectForLocation(location));
                 }
             }
