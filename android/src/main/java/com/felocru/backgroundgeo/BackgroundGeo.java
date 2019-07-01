@@ -33,7 +33,7 @@ public class BackgroundGeo extends Plugin {
     @PluginMethod()
     public void startBackground(final PluginCall call){
         this.intent = new Intent(getContext().getApplicationContext(),BackgroundService.class);
-        getContext().startService(this.intent);
+        getContext().startService(intent);
         getContext().getApplicationContext().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
         Disposable disposable = RxBus.subscribe(new Consumer<Object>() {
             @Override
@@ -49,8 +49,12 @@ public class BackgroundGeo extends Plugin {
 
     @PluginMethod()
     public void stopBackground(PluginCall call){
-        getContext().stopService(this.intent);
+        Log.i(TAG, "Stop background geo service");
+        gpsService.stopTracking();
+        //gpsService.stopSelf();
+        getContext().stopService(intent);
     }
+
     private JSObject getJSObjectForLocation(Location location) {
         if (location == null) return null;
 
