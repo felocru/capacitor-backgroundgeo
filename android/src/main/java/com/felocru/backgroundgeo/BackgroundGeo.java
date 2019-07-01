@@ -38,8 +38,8 @@ public class BackgroundGeo extends Plugin {
         Disposable disposable = RxBus.subscribe(new Consumer<Object>() {
             @Override
             public void accept(Object o) throws Exception{
-                if (o instanceof JSObject){
-                    Location location = (Location)((JSObject) o).get("location");
+                if (o instanceof Location){
+                    Location location = ((Location) o);
                     Log.i(TAG, "BackgroundEvent noti: "+location.toString());
                     notifyListeners("backgroundEvent", getJSObjectForLocation(location));
                 }
