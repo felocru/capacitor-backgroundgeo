@@ -51,7 +51,10 @@ public class BackgroundGeo extends Plugin {
     public void stopBackground(PluginCall call){
         Log.i(TAG, "Stop background geo service");
         gpsService.stopTracking();
-        //gpsService.stopSelf();
+        boolean force = call.getBoolean("force", false);
+        if (force) {
+            gpsService.stopSelf();
+        }
         getContext().stopService(intent);
     }
 
