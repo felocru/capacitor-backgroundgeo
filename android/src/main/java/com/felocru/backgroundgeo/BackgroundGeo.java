@@ -21,7 +21,7 @@ import android.util.Log;
 @NativePlugin(permissions = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION})
 public class BackgroundGeo extends Plugin {
 
-    public BackgroundService gpsService;
+    public BackgroundFusedService gpsService;
     private final String TAG = "BackgroundGeo";
 
     public boolean mTracking = false;
@@ -34,6 +34,7 @@ public class BackgroundGeo extends Plugin {
     public void startBackground(final PluginCall call){
         this.intent = new Intent(getContext().getApplicationContext(),BackgroundService.class);
         getContext().startService(intent);
+
         getContext().getApplicationContext().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
         Disposable disposable = RxBus.subscribe(new Consumer<Object>() {
             @Override
@@ -77,8 +78,8 @@ public class BackgroundGeo extends Plugin {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             String nameClass = name.getClassName();
-            if(nameClass.endsWith("BackgroundService")){
-                gpsService = ((BackgroundService.LocationServiceBinder) service).getService();
+            if(nameClass.endsWith("BackgroundFusedService")){
+                gpsService = ((BackgroundFusedService.LocationServiceBinder) service).getService();
                 gpsService.startTracking();
                 mTracking = true;
                 Log.i(TAG, "GPS Ready");
@@ -87,9 +88,9 @@ public class BackgroundGeo extends Plugin {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            if (name.getClassName().equals("BackgroundService")){
+            if (name.getClassName().equals("BackgroundFusedService")){
                 gpsService = null;
-                Log.i(TAG, "GPS disconnec");
+                Log.i(TAG, "GPS disconnected");
             }
         }
     };
