@@ -32,7 +32,7 @@ public class BackgroundGeo extends Plugin {
      */
     @PluginMethod()
     public void startBackground(final PluginCall call){
-        this.intent = new Intent(getContext().getApplicationContext(),BackgroundService.class);
+        this.intent = new Intent(getContext().getApplicationContext(),BackgroundFusedService.class);
         getContext().startService(intent);
 
         getContext().getApplicationContext().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
