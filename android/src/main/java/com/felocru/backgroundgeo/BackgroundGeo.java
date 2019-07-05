@@ -32,9 +32,10 @@ public class BackgroundGeo extends Plugin {
      */
     @PluginMethod()
     public void startBackground(final PluginCall call){
-        this.intent = new Intent(getContext().getApplicationContext(),BackgroundFusedService.class);
+        Log.i(TAG, "Entra a startBackground");
+        intent = new Intent(getContext().getApplicationContext(),BackgroundFusedService.class);
         getContext().startService(intent);
-
+        Log.i(TAG, "startService");
         getContext().getApplicationContext().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
         Disposable disposable = RxBus.subscribe(new Consumer<Object>() {
             @Override
@@ -77,6 +78,7 @@ public class BackgroundGeo extends Plugin {
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
+          Log.i(TAG, "onServiceConnected");
             String nameClass = name.getClassName();
             if(nameClass.endsWith("BackgroundFusedService")){
                 gpsService = ((BackgroundFusedService.LocationServiceBinder) service).getService();

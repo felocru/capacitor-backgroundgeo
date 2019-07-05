@@ -2,7 +2,7 @@
   <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="com.felocru.backgroundgeo.capacitorbackgroundgeo">
     <application>
-      <service android:name="com.felocru.backgroundgeo.BackgroundService"></service>
+      <service android:name="com.felocru.backgroundgeo.BackgroundFusedService"></service>
     </application>
   </manifest>
   

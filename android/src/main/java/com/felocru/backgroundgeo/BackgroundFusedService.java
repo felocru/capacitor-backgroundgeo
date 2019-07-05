@@ -30,17 +30,14 @@ public class BackgroundFusedService extends Service  {
     private FusedLocationProviderClient mFusedLocationClient;
     @Override
     public IBinder onBind(Intent intent) {
-        return binder;
+
+      return binder;
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        if (googleApiClient !=  null){
-            googleApiClient.connect();
-        }
-        startLocationUpdates();
-        return START_REDELIVER_INTENT; //Recuperar
+        return START_NOT_STICKY; //Recuperar
     }
 
     @Override
@@ -93,7 +90,7 @@ public class BackgroundFusedService extends Service  {
     }
 
     public void startTracking(){
-
+      startLocationUpdates();
     }
     public void stopTracking(){
         // stop location updates
