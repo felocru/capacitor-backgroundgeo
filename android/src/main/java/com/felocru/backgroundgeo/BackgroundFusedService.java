@@ -4,15 +4,18 @@ import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.location.Location;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.felocru.backgroundgeo.capacitorbackgroundgeo.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -22,28 +25,32 @@ import com.google.android.gms.location.LocationServices;
 
 public class BackgroundFusedService extends Service  {
     private final LocationServiceBinder binder = new LocationServiceBinder();
+    private NotificationManager mNM;
+    private int NOTIFICATION = R.string.local_service_started;
 
     private final String TAG = "BackgroundFusedService";
-    private GoogleApiClient googleApiClient;
     private LocationRequest locationRequest;
     private LocationCallback locationCallback;
     private FusedLocationProviderClient mFusedLocationClient;
     @Override
     public IBinder onBind(Intent intent) {
-
       return binder;
     }
 
-    @Override
+  @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        super.onStartCommand(intent, flags, startId);
-        return START_NOT_STICKY; //Recuperar
+      Log.i("LocalService", "Received start id " + startId + ": " + intent);
+
+      return START_NOT_STICKY; //Recuperar
     }
 
     @Override
     public void onDestroy() {
         stopLocationUpdates();
-        super.onDestroy();
+        if(Build.VERSION.SDK_INT >= 23){
+            mNM.cancel(NOTIFICATION);
+        }
+        Toast.makeText(this, R.string.local_service_stopped, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -70,6 +77,8 @@ public class BackgroundFusedService extends Service  {
                 }
             }
         };
+      Toast.makeText(this, R.string.local_service_started, Toast.LENGTH_SHORT).show();
+
     }
 
     protected void createLocationRequest() {
@@ -99,23 +108,36 @@ public class BackgroundFusedService extends Service  {
 
     @TargetApi(26)
     private Notification getNotification() {
-
+        mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        CharSequence text = getText(R.string.local_service_started);
         NotificationChannel channel = new NotificationChannel("channel_01", "My Channel", NotificationManager.IMPORTANCE_DEFAULT);
 
-        NotificationManager notificationManager = getSystemService(NotificationManager.class);
-        notificationManager.createNotificationChannel(channel);
-
-        Notification.Builder builder = new Notification.Builder(getApplicationContext(), "channel_01").setAutoCancel(true);
-        return builder.build();
+        mNM.createNotificationChannel(channel);
+        Intent notificationIntent = new Intent(this,  getApplication().getClass());
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+        Notification notification = new Notification.Builder(this, "channel_01")
+          //.setSmallIcon(R.drawable.small_icon)
+          .setTicker(text)
+          .setWhen(System.currentTimeMillis())
+          .setContentTitle(getText(R.string.app_name))
+          .setContentText(text)
+          .setContentIntent(contentIntent)
+          .build();
+        return notification;
     }
+
     private Notification getNotification2(){
-        Notification noti = new Notification.Builder(getApplicationContext())
-                .setContentTitle("Background geo")
-                .setContentText("Content Text")
-                //.setSmallIcon(R.drawable.new_mail)
-                //.setLargeIcon(aBitmap)
-                .build();
-        return noti;
+      CharSequence text = getText(R.string.local_service_started);
+      Intent notificationIntent = new Intent(this,  getApplication().getClass());
+      PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+
+      Notification noti = new Notification.Builder(this)
+        .setContentText(text)
+        .setWhen(System.currentTimeMillis())
+        .setContentTitle(getText(R.string.app_name))
+        .setContentIntent(contentIntent)
+        .build();
+      return noti;
 
     }
     public class LocationServiceBinder extends Binder {

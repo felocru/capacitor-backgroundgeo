@@ -13,9 +13,11 @@ import com.getcapacitor.NativePlugin;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
+import com.getcapacitor.ui.Toast;
 
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+
 import android.util.Log;
 
 @NativePlugin(permissions = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION})
@@ -23,8 +25,7 @@ public class BackgroundGeo extends Plugin {
 
     public BackgroundFusedService gpsService;
     private final String TAG = "BackgroundGeo";
-
-    public boolean mTracking = false;
+    private boolean mShouldUnbind;
     private Intent intent = null;
 
     /**
@@ -34,9 +35,11 @@ public class BackgroundGeo extends Plugin {
     public void startBackground(final PluginCall call){
         Log.i(TAG, "Entra a startBackground");
         intent = new Intent(getContext().getApplicationContext(),BackgroundFusedService.class);
-        getContext().startService(intent);
+        //getContext().startService(intent);
         Log.i(TAG, "startService");
+
         getContext().getApplicationContext().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+        mShouldUnbind = true;
         Disposable disposable = RxBus.subscribe(new Consumer<Object>() {
             @Override
             public void accept(Object o) throws Exception{
@@ -52,12 +55,16 @@ public class BackgroundGeo extends Plugin {
     @PluginMethod()
     public void stopBackground(PluginCall call){
         Log.i(TAG, "Stop background geo service");
-        gpsService.stopTracking();
-        boolean force = call.getBoolean("force", false);
-        if (force) {
-            gpsService.stopSelf();
+        /*if(gpsService != null) {
+          gpsService.stopTracking();
+        }*/
+        if (mShouldUnbind){
+          gpsService.stopTracking();
+
+          getContext().getApplicationContext().unbindService(serviceConnection);
+          mShouldUnbind = false;
+          gpsService = null;
         }
-        getContext().stopService(intent);
     }
 
     private JSObject getJSObjectForLocation(Location location) {
@@ -83,7 +90,7 @@ public class BackgroundGeo extends Plugin {
             if(nameClass.endsWith("BackgroundFusedService")){
                 gpsService = ((BackgroundFusedService.LocationServiceBinder) service).getService();
                 gpsService.startTracking();
-                mTracking = true;
+                //Toast.show(getContext(), "Iniciando");
                 Log.i(TAG, "GPS Ready");
             }
         }
