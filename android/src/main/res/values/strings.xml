@@ -1,4 +1,4 @@
-<resources></resources>
+<resources>
     <string name="my_string">Just a simple string</string>
     <string name="local_service_started">Tracking geolocation</string>
     <string name="local_service_stopped">Tracking stopped geolocation</string>
